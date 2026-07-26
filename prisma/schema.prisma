@@ -1,56 +1,139 @@
-// This is your Prisma schema file
-// Learn more: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "sqlite"
 }
 
 model User {
-  id        String   @id @default(cuid())
-  clerkId   String   @unique
-  email     String   @unique
-  name      String?
-  imageUrl  String?
-  plan      Plan     @default(FREE)
-  auditsUsed Int     @default(0)
-  audits    Audit[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                    String   @id @default(cuid())
+  clerkId               String   @unique
+  email                 String   @unique
+  name                  String?
+  imageUrl              String?
+  plan                  Plan     @default(FREE)
+  auditsUsed            Int      @default(0)
+  emailNotifications    Boolean  @default(true)
+  weeklyReports         Boolean  @default(true)
+  audits                Audit[]
+  savedReports          SavedReport[]
+  auditComparisons      AuditComparison[]
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@index([clerkId])
+  @@index([email])
 }
 
 model Audit {
-  id            String      @id @default(cuid())
-  url           String
-  favicon       String?
-  title         String?
-  status        AuditStatus @default(PENDING)
-  screenshotUrl String?
-  scores        Json?
-  report        Json?
-  pageSpeedData Json?
-  error         String?
-  isFavorite    Boolean     @default(false)
-  userId        String
-  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  id                    String      @id @default(cuid())
+  url                   String
+  domain                String
+  favicon               String?
+  title                 String?
+  description           String?
+  status                AuditStatus @default(PENDING)
+
+  // Screenshots
+  desktopScreenshot     String?
+  mobileScreenshot      String?
+  fullPageScreenshot    String?
+
+  // Scores
+  overallScore          Int?
+  performanceScore      Int?
+  seoScore              Int?
+  accessibilityScore    Int?
+  uxScore               Int?
+  conversionScore       Int?
+
+  // Performance Metrics
+  performanceMetrics    Json?
+
+  // SEO Data
+  seoAnalysis           Json?
+
+  // Accessibility Data
+  accessibilityAnalysis Json?
+
+  // UX/Conversion Data
+  uxAnalysis            Json?
+  conversionAnalysis    Json?
+
+  // AI Generated
+  aiReport              Json?
+  executiveSummary      String?
+  topIssues             Json?
+  quickWins             Json?
+  priorityRoadmap       Json?
+
+  // Raw Data
+  pageSpeedData         Json?
+  error                 String?
+
+  // Audit Properties
+  isFavorite            Boolean     @default(false)
+  startedAt             DateTime    @default(now())
+  completedAt           DateTime?
+
+  // Relations
+  userId                String
+  user                  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  savedReports          SavedReport[]
+  comparisons1          AuditComparison[] @relation("audit1")
+  comparisons2          AuditComparison[] @relation("audit2")
+
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
 
   @@index([userId])
   @@index([status])
   @@index([createdAt])
+  @@index([domain])
+}
+
+model SavedReport {
+  id          String   @id @default(cuid())
+  userId      String
+  auditId     String
+  folderName  String?
+  description String?
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  audit       Audit    @relation(fields: [auditId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+  @@index([auditId])
+  @@unique([userId, auditId])
+}
+
+model AuditComparison {
+  id        String   @id @default(cuid())
+  userId    String
+  auditId1  String
+  auditId2  String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  audit1    Audit    @relation("audit1", fields: [auditId1], references: [id], onDelete: Cascade)
+  audit2    Audit    @relation("audit2", fields: [auditId2], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@unique([userId, auditId1, auditId2])
 }
 
 enum AuditStatus {
   PENDING
   RUNNING
+  ANALYZING_SEO
+  ANALYZING_PERFORMANCE
+  ANALYZING_ACCESSIBILITY
+  ANALYZING_UX
+  GENERATING_REPORT
   COMPLETED
   FAILED
+  CANCELLED
 }
 
 enum Plan {
