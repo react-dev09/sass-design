@@ -4,10 +4,17 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, AlertTriangle, AlertCircle, ChevronDown } from 'lucide-react';
 
+interface AuditData {
+  url: string;
+  timestamp: number;
+  performance?: { score: number };
+  seo?: { score: number };
+}
+
 export default function AuditResults() {
   const params = useParams();
   const auditId = params.id as string;
-  const [audit, setAudit] = useState(null);
+  const [audit, setAudit] = useState<AuditData | null>(null);
   const [loading, setLoading] = useState(true);
   const [expandedIssue, setExpandedIssue] = useState(0);
 
