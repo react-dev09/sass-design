@@ -192,12 +192,12 @@ gzip_level 6;
       <div className='grid grid-cols-2 gap-6'>
         <div className='rounded-2xl border border-violet-800 bg-violet-900/20 p-8'>
           <p className='text-zinc-400 text-sm font-semibold mb-2'>PERFORMANCE SCORE</p>
-          <div className='text-5xl font-bold text-violet-400'>{Math.round(audit.performance.score)}</div>
+          <div className='text-5xl font-bold text-violet-400'>{audit.performance ? Math.round(audit.performance.score) : 'N/A'}</div>
           <p className='text-xs text-zinc-500 mt-2'>6 critical issues found</p>
         </div>
         <div className='rounded-2xl border border-emerald-800 bg-emerald-900/20 p-8'>
           <p className='text-zinc-400 text-sm font-semibold mb-2'>SEO SCORE</p>
-          <div className='text-5xl font-bold text-emerald-400'>{Math.round(audit.seo.score)}</div>
+          <div className='text-5xl font-bold text-emerald-400'>{audit.seo ? Math.round(audit.seo.score) : 'N/A'}</div>
           <p className='text-xs text-zinc-500 mt-2'>1 critical fix needed</p>
         </div>
       </div>
@@ -245,11 +245,11 @@ gzip_level 6;
                   <div>
                     <p className='text-sm font-semibold text-zinc-200 mb-2'>📄 AFFECTED FILES:</p>
                     <div className='space-y-2'>
-                      {error.files.map((file, j) => (
+                      {error.files.map((file: any, j) => (
                         <div key={j} className='bg-zinc-900 rounded p-2 border border-zinc-700 font-mono text-xs'>
                           <div className='flex items-center justify-between mb-1'>
-                            <span className='text-zinc-300'><strong>{file.name}</strong> {file.size && `(${file.size})`}</span>
-                            {file.line && <span className='text-orange-400'>Line {file.line}</span>}
+                            <span className='text-zinc-300'><strong>{file.name}</strong> {file.size ? `(${file.size})` : ''}</span>
+                            {file.line ? <span className='text-orange-400'>Line {file.line}</span> : null}
                           </div>
                           <div className='flex items-center justify-between'>
                             <span className='text-red-400'>❌ Issue: {file.issue}</span>

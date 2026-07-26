@@ -61,7 +61,7 @@ export function AuditReportContent({ auditId, defaultAudit }: AuditReportContent
   const isRealAudit = audit.screenshotUrl || (audit.url !== 'https://example.com');
 
   // Default scores to 0 if not a real audit
-  const defaultScores = isRealAudit ? scores : {
+  const defaultScores = (isRealAudit && scores) ? scores : {
     overall: 0,
     performance: 0,
     seo: 0,
@@ -73,8 +73,8 @@ export function AuditReportContent({ auditId, defaultAudit }: AuditReportContent
   // Generate mobile-specific scores (slightly lower than desktop)
   const mobileScores = deviceType === 'mobile' ? {
     ...defaultScores,
-    overall: Math.max(defaultScores.overall - 5, 0),
-    performance: Math.max(defaultScores.performance - 8, 0),
+    overall: Math.max((defaultScores?.overall ?? 0) - 5, 0),
+    performance: Math.max((defaultScores?.performance ?? 0) - 8, 0),
   } : defaultScores;
 
   return (

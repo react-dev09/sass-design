@@ -1,4 +1,7 @@
+export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@clerk/nextjs/server';
 
 import { prisma } from '@/lib/prisma';
 
@@ -26,15 +29,15 @@ export async function GET(req: NextRequest) {
 
     // Calculate statistics
     const totalAudits = audits.length;
-    const completedAudits = audits.filter(a => a.status === 'COMPLETED').length;
-    const failedAudits = audits.filter(a => a.status === 'FAILED').length;
+    const completedAudits = audits.filter((a: any) => a.status === 'COMPLETED').length;
+    const failedAudits = audits.filter((a: any) => a.status === 'FAILED').length;
 
     // Calculate average scores
-    const auditsWithScores = audits.filter(a => a.overallScore);
+    const auditsWithScores = audits.filter((a: any) => a.overallScore);
     const avgOverallScore =
       auditsWithScores.length > 0
         ? Math.round(
-            auditsWithScores.reduce((sum, a) => sum + (a.overallScore || 0), 0) /
+            auditsWithScores.reduce((sum: any, a: any) => sum + (a.overallScore || 0), 0) /
               auditsWithScores.length
           )
         : 0;
@@ -42,7 +45,7 @@ export async function GET(req: NextRequest) {
     const avgPerformanceScore =
       auditsWithScores.length > 0
         ? Math.round(
-            auditsWithScores.reduce((sum, a) => sum + (a.performanceScore || 0), 0) /
+            auditsWithScores.reduce((sum: any, a: any) => sum + (a.performanceScore || 0), 0) /
               auditsWithScores.length
           )
         : 0;
@@ -50,17 +53,17 @@ export async function GET(req: NextRequest) {
     const avgSeoScore =
       auditsWithScores.length > 0
         ? Math.round(
-            auditsWithScores.reduce((sum, a) => sum + (a.seoScore || 0), 0) /
+            auditsWithScores.reduce((sum: any, a: any) => sum + (a.seoScore || 0), 0) /
               auditsWithScores.length
           )
         : 0;
 
     // Get unique domains
-    const uniqueDomains = new Set(audits.map(a => a.domain)).size;
+    const uniqueDomains = new Set(audits.map((a: any) => a.domain)).size;
 
     // Get most common issues
     const issuesMap = new Map<string, number>();
-    audits.forEach(audit => {
+    audits.forEach((audit: any) => {
       if (audit.topIssues && Array.isArray(audit.topIssues)) {
         (audit.topIssues as Array<{ title: string }>).forEach(issue => {
           issuesMap.set(issue.title, (issuesMap.get(issue.title) || 0) + 1);
@@ -78,10 +81,10 @@ export async function GET(req: NextRequest) {
 
     // Calculate score distribution
     const scoreDistribution = {
-      excellent: auditsWithScores.filter(a => a.overallScore! >= 90).length,
-      good: auditsWithScores.filter(a => a.overallScore! >= 70 && a.overallScore! < 90).length,
-      needsWork: auditsWithScores.filter(a => a.overallScore! >= 50 && a.overallScore! < 70).length,
-      poor: auditsWithScores.filter(a => a.overallScore! < 50).length,
+      excellent: auditsWithScores.filter((a: any) => (a.overallScore ?? 0) >= 90).length,
+      good: auditsWithScores.filter((a: any) => (a.overallScore ?? 0) >= 70 && (a.overallScore ?? 0) < 90).length,
+      needsWork: auditsWithScores.filter((a: any) => (a.overallScore ?? 0) >= 50 && (a.overallScore ?? 0) < 70).length,
+      poor: auditsWithScores.filter((a: any) => (a.overallScore ?? 0) < 50).length,
     };
 
     return NextResponse.json({
@@ -116,7 +119,7 @@ function getMonthlyData(audits: any[]) {
   }
 
   // Count audits by month
-  audits.forEach(audit => {
+  audits.forEach((audit: any) => {
     const auditDate = new Date(audit.createdAt);
     const monthKey = auditDate.toLocaleString('default', { month: 'short', year: '2-digit' });
 

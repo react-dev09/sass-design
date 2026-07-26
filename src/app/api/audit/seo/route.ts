@@ -1,4 +1,7 @@
+export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@clerk/nextjs/server';
 
 import { prisma } from '@/lib/prisma';
 import { performSeoAudit } from '@/lib/seo-audit';
@@ -39,7 +42,7 @@ export async function POST(req: NextRequest) {
       where: { id: auditId },
       data: {
         seoScore: analysis.score,
-        seoAnalysis: analysis,
+        seoAnalysis: analysis as any,
       },
     });
 

@@ -53,10 +53,15 @@ export async function runAudit(auditId: string, url: string) {
         status: 'COMPLETED',
         title,
         favicon: getFaviconUrl(normalizedUrl),
-        screenshotUrl: screenshot,
-        scores: JSON.parse(JSON.stringify(scores)),
-        report: JSON.parse(JSON.stringify(report)),
+        desktopScreenshot: screenshot,
+        aiReport: JSON.parse(JSON.stringify(report)),
         pageSpeedData: psData ? JSON.parse(JSON.stringify(psData)) : null,
+        overallScore: scores.overall,
+        performanceScore: scores.performance,
+        seoScore: scores.seo,
+        accessibilityScore: scores.accessibility,
+        uxScore: scores.ux,
+        conversionScore: scores.conversion,
       },
     });
 

@@ -84,7 +84,7 @@ export function LuxuryWaveBg() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const noiseRef = useRef<SimplexNoise>(new SimplexNoise());
   const timeRef = useRef<number>(0);
-  const animationRef = useRef<number>();
+  const animationRef = useRef<number | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;

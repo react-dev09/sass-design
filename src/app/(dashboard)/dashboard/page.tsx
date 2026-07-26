@@ -88,7 +88,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Charts */}
-      <AuditChart userId={user.id} />
+      <AuditChart />
 
       {/* Recent Audits */}
       <RecentAudits audits={recentAudits} />

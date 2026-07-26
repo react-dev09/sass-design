@@ -5,7 +5,7 @@ import { useEffect, useRef } from 'react';
 export function FlowingWavesBg() {
   const svgRef = useRef<SVGSVGElement>(null);
   const timeRef = useRef<number>(0);
-  const animationRef = useRef<number>();
+  const animationRef = useRef<number | null>(null);
 
   useEffect(() => {
     const svg = svgRef.current;
