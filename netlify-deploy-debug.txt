@@ -1,0 +1,80 @@
+[project.ts]: detectFrameworks
+[project.ts]: detectBuildSystem
+[project.ts]: detectWorkspaces
+[project.ts]: detectPackageManager
+[project.ts]: detectFrameworksInPath - undefined
+ΓÇï
+Γ¥» Initial build environment
+config: D:\AI-class\SASS-dashboard\designpulse-ai\netlify.toml
+context: dev
+cwd: D:\AI-class\SASS-dashboard\designpulse-ai
+featureFlags: []
+mode: cli
+repositoryRoot: D:\AI-class\SASS-dashboard\designpulse-ai
+siteId: 83079be3-ae61-4f64-aafb-46e1ab2ca91e
+ΓÇï
+Γ¥» UI build settings
+baseRelDir: true
+build:
+  command: npm run build
+  publish: .next/static
+functionsDirectory: netlify/functions
+plugins:
+  - inputs: {}
+    package: "@netlify/plugin-nextjs"
+ΓÇï
+Γ¥» Resolved build environment
+branch: main
+buildDir: D:\AI-class\SASS-dashboard\designpulse-ai
+configPath: D:\AI-class\SASS-dashboard\designpulse-ai\netlify.toml
+context: dev
+env:
+  - NODE_VERSION
+  - SKIP_ENV_VALIDATION
+  - DEPLOY_ID
+  - BUILD_ID
+  - ACCOUNT_ID
+  - REPOSITORY_URL
+  - NETLIFY_LOCAL
+  - HEAD
+  - COMMIT_REF
+  - CACHED_COMMIT_REF
+  - PULL_REQUEST
+  - LANG
+  - LANGUAGE
+  - LC_ALL
+  - GATSBY_TELEMETRY_DISABLED
+  - NEXT_TELEMETRY_DISABLED
+ΓÇï
+Γ¥» Resolved config
+build:
+  command: npm run build
+  commandOrigin: config
+  environment:
+    - NODE_VERSION
+    - SKIP_ENV_VALIDATION
+  publish: D:\AI-class\SASS-dashboard\designpulse-ai\.next\static
+  publishOrigin: config
+functions:
+  "*":
+    node_bundler: esbuild
+functionsDirectory: D:\AI-class\SASS-dashboard\designpulse-ai\netlify\functions
+plugins:
+  - inputs: {}
+    origin: ui
+    package: "@netlify/plugin-nextjs"
+redirects:
+  - from: /*
+    status: 200
+    to: /index.html
+redirectsOrigin: config
+ ┬╗   Warning: JSONHTTPError: Forbidden
+ ┬╗       at parseResponse (file:///C:/Users/CODECLOUDS-SWETA/AppData/Local/npm-cache/_npx/90d26507e643fcc0/node_modules/@netlify/api/lib/methods/response.js:34:39)
+ ┬╗       at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+ ┬╗       at async callMethod (file:///C:/Users/CODECLOUDS-SWETA/AppData/Local/npm-cache/_npx/90d26507e643fcc0/node_modules/@netlify/api/lib/methods/index.js:26:28)
+ ┬╗       at async deploy (file:///C:/Users/CODECLOUDS-SWETA/AppData/Local/npm-cache/_npx/90d26507e643fcc0/node_modules/netlify/dist/commands/deploy/deploy.js:1017:33)
+ ┬╗       at async BaseCommand.<anonymous> (file:///C:/Users/CODECLOUDS-SWETA/AppData/Local/npm-cache/_npx/90d26507e643fcc0/node_modules/netlify/dist/commands/deploy/index.js:107:5)
+ ┬╗       at async BaseCommand.parseAsync (C:\Users\CODECLOUDS-SWETA\AppData\Local\npm-cache\_npx\90d26507e643fcc0\node_modules\commander\lib\command.js:1092:5)
+ ┬╗       at async runProgram (file:///C:/Users/CODECLOUDS-SWETA/AppData/Local/npm-cache/_npx/90d26507e643fcc0/node_modules/netlify/dist/utils/run-program.js:15:9)
+ ┬╗       at async main (file:///C:/Users/CODECLOUDS-SWETA/AppData/Local/npm-cache/_npx/90d26507e643fcc0/node_modules/netlify/bin/run.js:75:5)
+ ┬╗       at async file:///C:/Users/CODECLOUDS-SWETA/AppData/Local/npm-cache/_npx/90d26507e643fcc0/node_modules/netlify/bin/run.js:86:1
