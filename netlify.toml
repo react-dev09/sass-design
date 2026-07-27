@@ -1,12 +1,6 @@
 [build]
   command = "npx prisma generate && npm run build"
-  functions = "netlify/functions"
-  publish = ".netlify/output/public"
 
 [build.environment]
   NODE_VERSION = "22"
   SKIP_ENV_VALIDATION = "false"
-
-[functions]
-  directory = "netlify/functions"
-  node_bundler = "esbuild"
