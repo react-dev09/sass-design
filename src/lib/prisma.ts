@@ -1,30 +1,33 @@
-import { PrismaClient } from '@prisma/client';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+declare const require: any;
+const { PrismaClient } = require('@prisma/client');
+
+type PrismaClientType = InstanceType<typeof PrismaClient> | any;
 
 const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined;
+  prisma: PrismaClientType | undefined;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function createPrismaClient(): any {
-  // Skip Prisma initialization during build time
+function createPrismaClient(): PrismaClientType {
   if (process.env.npm_lifecycle_event === 'build' || process.env.__NEXT_DATA__) {
-    return {} as PrismaClient;
+    return {} as PrismaClientType;
   }
 
-  const opts: Record<string, unknown> = {
+  const opts: any = {
     log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
   };
 
   try {
-    return new PrismaClient(opts as ConstructorParameters<typeof PrismaClient>[0]);
+    return new PrismaClient(opts);
   } catch (error) {
     console.warn('Prisma Client initialization failed:', error);
-    return {} as PrismaClient;
+    return {} as PrismaClientType;
   }
 }
 
 export const prisma = globalForPrisma.prisma ?? createPrismaClient();
 
 if (process.env.NODE_ENV !== 'production' && prisma && typeof prisma === 'object' && '$disconnect' in prisma) {
-  globalForPrisma.prisma = prisma as PrismaClient;
+  globalForPrisma.prisma = prisma;
 }
