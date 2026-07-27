@@ -1,16 +1,11 @@
 [build]
   command = "npm run build"
   functions = "netlify/functions"
-  publish = ".next/static"
+  publish = ".netlify/output/public"
 
 [build.environment]
   NODE_VERSION = "20"
   SKIP_ENV_VALIDATION = "false"
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
 
 [functions]
   directory = "netlify/functions"
