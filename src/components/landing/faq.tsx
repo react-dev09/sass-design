@@ -44,71 +44,73 @@ export function FAQSection() {
   const [open, setOpen] = useState<number | null>(null);
 
   return (
-    <section id="faq" className="py-16 lg:py-24 max-w-7xl mx-auto px-6 relative" style={{
+    <section id="faq" className="py-16 lg:py-24 relative w-full overflow-hidden" style={{
       backgroundImage: 'url(/static/images/pattern-testimonials-card.be52eae.svg)',
       backgroundRepeat: 'no-repeat',
-      backgroundPosition: 'right -50px top',
+      backgroundPosition: 'right top',
       backgroundSize: '400px 300px'
     }}>
-      <div className="text-center mb-16">
-        <motion.p
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="text-xs font-semibold text-blue-600 uppercase tracking-widest mb-3"
-        >
-          FAQ
-        </motion.p>
-        <motion.h2
-          initial={{ opacity: 0, y: 15 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.1 }}
-          className="text-3xl sm:text-4xl font-bold"
-          style={{ color: '#000000' }}
-        >
-          Frequently asked questions
-        </motion.h2>
-      </div>
-
-      <div className="space-y-3 w-1/2 mx-auto">
-        {faqs.map((faq, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, y: 10 }}
+      <div className="max-w-7xl mx-auto px-6 relative">
+        <div className="text-center mb-16">
+          <motion.p
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            className="text-xs font-semibold text-blue-600 uppercase tracking-widest mb-3"
+          >
+            FAQ
+          </motion.p>
+          <motion.h2
+            initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: i * 0.05 }}
-            className="group rounded-xl border border-gray-300 overflow-hidden hover:border-gray-400 hover:shadow-lg transition-all duration-300"
-            style={{ backgroundColor: '#ecf4f2' }}
+            transition={{ delay: 0.1 }}
+            className="text-3xl sm:text-4xl font-bold"
+            style={{ color: '#000000' }}
           >
-            <button
-              onClick={() => setOpen(open === i ? null : i)}
-              className="w-full flex items-center justify-between px-6 py-5 text-left text-sm font-medium transition-all duration-300"
-              style={{ color: '#000000' }}
+            Frequently asked questions
+          </motion.h2>
+        </div>
+
+        <div className="space-y-3 w-full md:w-1/2 mx-auto">
+          {faqs.map((faq, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.05 }}
+              className="group rounded-xl border border-gray-300 overflow-hidden hover:border-gray-400 hover:shadow-lg transition-all duration-300"
+              style={{ backgroundColor: '#ecf4f2' }}
             >
-              <span className="flex-1">{faq.q}</span>
-              <motion.div
-                animate={{ rotate: open === i ? 180 : 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                <ChevronDown className="w-5 h-5 flex-shrink-0 transition-colors duration-300" style={{ color: '#666666' }} />
-              </motion.div>
-            </button>
-            {open === i && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.3 }}
-                className="px-6 pb-5 text-sm leading-relaxed border-t border-gray-200 pt-4"
+              <button
+                onClick={() => setOpen(open === i ? null : i)}
+                className="w-full flex items-center justify-between px-6 py-5 text-left text-sm font-medium transition-all duration-300"
                 style={{ color: '#000000' }}
               >
-                {faq.a}
-              </motion.div>
-            )}
-          </motion.div>
-        ))}
+                <span className="flex-1">{faq.q}</span>
+                <motion.div
+                  animate={{ rotate: open === i ? 180 : 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <ChevronDown className="w-5 h-5 flex-shrink-0 transition-colors duration-300" style={{ color: '#666666' }} />
+                </motion.div>
+              </button>
+              {open === i && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="px-6 pb-5 text-sm leading-relaxed border-t border-gray-200 pt-4"
+                  style={{ color: '#000000' }}
+                >
+                  {faq.a}
+                </motion.div>
+              )}
+            </motion.div>
+          ))}
+        </div>
       </div>
     </section>
   );
