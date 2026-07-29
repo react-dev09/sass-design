@@ -101,8 +101,6 @@ function parseGtmetrixData(reportData: any, lighthouseData: any): PageSpeedData 
   const categories = lighthouseData as Record<string, unknown>;
   const audits = (categories?.audits ?? {}) as Record<string, Record<string, unknown>>;
 
-  const getScore = (key: string) =>
-    Math.round(((cats[key]?.score as number) ?? 0) * 100);
 
   const getNumericValue = (key: string) =>
     Math.round((audits[key]?.numericValue as number) ?? 0);
