@@ -26,8 +26,22 @@ export function ReportActions({ auditId, url, isFavorite: initialFavorite }: Rep
 
   const handleShare = async () => {
     const shareUrl = `${window.location.origin}/audits/${auditId}`;
-    await navigator.clipboard.writeText(shareUrl);
-    toast.success('Report link copied to clipboard!');
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      toast.success('Report link copied to clipboard!');
+    } catch (err) {
+      try {
+        const input = document.createElement('input');
+        input.value = shareUrl;
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand('copy');
+        document.body.removeChild(input);
+        toast.success('Report link copied to clipboard!');
+      } catch (fallbackErr) {
+        toast.error('Failed to copy link. Please copy from the address bar.');
+      }
+    }
   };
 
   const handleFavorite = async () => {
@@ -54,7 +68,11 @@ export function ReportActions({ auditId, url, isFavorite: initialFavorite }: Rep
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url }),
       });
-      const { auditId: newId } = await res.json();
+      const { auditId: newId, audit: realAuditData } = await res.json();
+      
+      // Save real audit data to localStorage
+      localStorage.setItem(`audit_${newId}`, JSON.stringify(realAuditData));
+      
       toast.success('Re-running audit…');
       router.push(`/audits/${newId}`);
     } catch {
@@ -181,48 +199,48 @@ export function ReportActions({ auditId, url, isFavorite: initialFavorite }: Rep
       <button
         onClick={handleFavorite}
         className={cn(
-          'p-2 rounded-lg border transition-all',
+          'p-2 rounded-lg border transition-all shadow-sm bg-white',
           isFavorite
-            ? 'text-amber-400 bg-amber-500/10 border-amber-500/20'
-            : 'text-zinc-500 border-zinc-800 hover:text-amber-400 hover:border-amber-500/20'
+            ? 'text-amber-500 bg-amber-50 border-amber-200'
+            : 'text-zinc-500 border-zinc-200 hover:text-amber-500 hover:border-amber-200 hover:bg-amber-50'
         )}
         title="Favorite"
       >
-        <Star className="w-4 h-4" fill={isFavorite ? 'currentColor' : 'none'} />
+        <Star className="w-4 h-4 shrink-0" fill={isFavorite ? 'currentColor' : 'none'} />
       </button>
 
       <button
         onClick={handleShare}
-        className="flex items-center gap-1.5 text-sm text-zinc-400 hover:text-zinc-200 border border-zinc-800 hover:border-zinc-700 px-3 py-2 rounded-lg transition-all"
+        className="flex items-center gap-1.5 text-sm text-zinc-600 hover:text-zinc-900 bg-white hover:bg-zinc-50 border border-zinc-200 hover:border-zinc-300 px-3 py-2 rounded-lg transition-all shadow-sm"
       >
-        <Share2 className="w-3.5 h-3.5" />
+        <Share2 className="w-4 h-4 shrink-0" />
         Share
       </button>
 
       <button
         onClick={handleRerun}
         disabled={isRerunning}
-        className="flex items-center gap-1.5 text-sm text-zinc-400 hover:text-zinc-200 border border-zinc-800 hover:border-zinc-700 px-3 py-2 rounded-lg transition-all disabled:opacity-50"
+        className="flex items-center gap-1.5 text-sm text-zinc-600 hover:text-zinc-900 bg-white hover:bg-zinc-50 border border-zinc-200 hover:border-zinc-300 px-3 py-2 rounded-lg transition-all shadow-sm disabled:opacity-50"
       >
-        <RefreshCw className={cn('w-3.5 h-3.5', isRerunning && 'animate-spin')} />
+        <RefreshCw className={cn('w-4 h-4 shrink-0', isRerunning && 'animate-spin')} />
         Re-run
       </button>
 
       <button
         onClick={handleExport}
-        className="flex items-center gap-1.5 text-sm bg-violet-600 hover:bg-violet-500 text-white px-3 py-2 rounded-lg transition-colors"
+        className="flex items-center gap-1.5 text-sm bg-violet-600 hover:bg-violet-500 text-white px-3 py-2 rounded-lg transition-colors shadow-sm"
       >
-        <Download className="w-3.5 h-3.5" />
+        <Download className="w-4 h-4 shrink-0" />
         Export PDF
       </button>
 
       <button
         onClick={handleDelete}
         disabled={isDeleting}
-        className="p-2 rounded-lg text-zinc-600 hover:text-red-400 hover:bg-red-500/10 border border-zinc-800 hover:border-red-500/20 transition-all"
+        className="p-2 rounded-lg text-zinc-500 bg-white hover:text-red-500 hover:bg-red-50 border border-zinc-200 hover:border-red-200 transition-all shadow-sm"
         title="Delete"
       >
-        <Trash2 className="w-4 h-4" />
+        <Trash2 className="w-4 h-4 shrink-0" />
       </button>
     </div>
   );

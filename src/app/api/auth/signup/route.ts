@@ -1,57 +1,49 @@
 import { NextRequest, NextResponse } from 'next/server';
-import crypto from 'crypto';
-
-const demoUsers = new Map<string, { id: string; email: string; clerkId: string; name: string }>();
+import { getUserByEmail, createUser } from '@/lib/auth-store';
 
 export async function POST(req: NextRequest) {
   try {
-    const { email } = await req.json();
+    const body = await req.json();
+    const { email, password } = body as { email?: string; password?: string };
 
+    // ── Validation ──────────────────────────────────────────────────────────
     if (!email || !email.includes('@')) {
-      return NextResponse.json({ error: 'Valid email required' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'A valid email address is required.' },
+        { status: 400 }
+      );
     }
 
-    // Check if user exists
-    let user = Array.from(demoUsers.values()).find(u => u.email === email);
-
-    // Create user if doesn't exist
-    if (!user) {
-      const userId = crypto.randomUUID();
-      user = {
-        id: userId,
-        email,
-        clerkId: `demo_${Date.now()}`,
-        name: email.split('@')[0],
-      };
-      demoUsers.set(userId, user);
+    if (!password || password.length < 6) {
+      return NextResponse.json(
+        { error: 'Password must be at least 6 characters.' },
+        { status: 400 }
+      );
     }
 
-    // Create response with cookie
-    const response = NextResponse.json({
-      success: true,
-      userId: user.id,
-      email: user.email,
-    });
+    // ── Duplicate check ─────────────────────────────────────────────────────
+    const existing = getUserByEmail(email);
+    if (existing) {
+      return NextResponse.json(
+        { error: 'Email already registered. Please sign in instead.' },
+        { status: 409 }
+      );
+    }
 
-    // Set session cookie
-    response.cookies.set('user_id', user.id, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 30,
-      path: '/',
-    });
+    // ── Create user ─────────────────────────────────────────────────────────
+    const user = await createUser(email, password);
 
-    response.cookies.set('user_email', email, {
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 30,
-      path: '/',
-    });
+    const response = NextResponse.json(
+      { success: true, userId: user.id, email: user.email },
+      { status: 201 }
+    );
 
     return response;
   } catch (error) {
-    console.error('Sign up error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error('Sign-up error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error. Please try again.' },
+      { status: 500 }
+    );
   }
 }

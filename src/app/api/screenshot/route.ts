@@ -20,12 +20,12 @@ export async function POST(request: NextRequest) {
       // Service 2: screenshotone (alternative)
       () => `https://api.screenshotone.com/take?access_key=free&url=${encodeURIComponent(url)}&viewport_width=${width}&viewport_height=${height}&full_page=${fullPage}`,
 
-      // Service 3: thum.io (simple and reliable)
-      () => `https://image.thum.io/get/width/${width}/height/${height}/${fullPage ? 'full' : ''}/${encodeURIComponent(url.replace(/^https?:\/\//, ''))}`,
+      // Service 3: microlink.io (free, no API key needed, returns image directly with embed param)
+      () => `https://api.microlink.io/?url=${encodeURIComponent(url)}&screenshot=true&meta=false&embed=screenshot.url`,
     ];
 
-    // Use the first service for now (ApiFlash)
-    const screenshotUrl = services[0]();
+    // Use microlink.io as primary free service since ApiFlash might be rate-limited
+    const screenshotUrl = services[2]();
 
     console.log('✅ [API] Generated screenshot URL:', screenshotUrl);
 

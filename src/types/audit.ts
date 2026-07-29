@@ -25,7 +25,8 @@ export interface AffectedFile {
   size?: string;
   line?: number;
   issue: string;
-  fix: string;
+  fix?: string;
+  snippet?: string;
 }
 
 export interface Issue {

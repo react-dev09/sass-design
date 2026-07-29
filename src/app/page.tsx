@@ -1,5 +1,6 @@
 import { LandingNavbar } from '@/components/landing/navbar';
 import { HeroSection } from '@/components/landing/hero';
+import { FeatureShowcase } from '@/components/landing/feature-showcase';
 import { FeaturesSection } from '@/components/landing/features';
 import { HowItWorksSection } from '@/components/landing/how-it-works';
 import { PricingSection } from '@/components/landing/pricing';
@@ -21,6 +22,7 @@ export default function HomePage() {
       <HeroSection />
       <FeaturesSection />
       <HowItWorksSection />
+      <FeatureShowcase />
       <PricingSection />
       <TestimonialsSection />
       <FAQSection />

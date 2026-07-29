@@ -30,9 +30,19 @@ export function AuditReportContent({ auditId, defaultAudit }: AuditReportContent
       const saved = localStorage.getItem(`audit_${auditId}`);
       if (saved) {
         const data = JSON.parse(saved);
-        const mock = generateMockReport({ url: data.url });
-
         const domain = new URL(data.url).hostname;
+
+        // If the data already contains scores and report (from our real API), use them!
+        // Otherwise, fallback to generating a mock report (for backwards compatibility).
+        let scores = data.scores;
+        let report = data.report;
+
+        if (!scores || !report) {
+          const mock = generateMockReport({ url: data.url });
+          scores = mock.scores;
+          report = mock.report;
+        }
+
         const updatedAudit: Audit = {
           id: auditId,
           url: data.url,
@@ -42,8 +52,8 @@ export function AuditReportContent({ auditId, defaultAudit }: AuditReportContent
           isFavorite: false,
           userId: 'demo',
           screenshotUrl: data.screenshotUrl || undefined,
-          scores: mock.scores,
-          report: mock.report,
+          scores: scores,
+          report: report,
           createdAt: data.timestamp || new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         };

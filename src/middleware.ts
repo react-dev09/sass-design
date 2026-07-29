@@ -1,45 +1,65 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const CLERK_KEY = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
-const hasValidClerkKey = CLERK_KEY && CLERK_KEY.startsWith('pk_') && CLERK_KEY.length > 20;
+// Paths that require the user to be logged in
+const PROTECTED_PREFIXES = [
+  '/dashboard',
+  '/audits',
+  '/reports',
+  '/analytics',
+  '/favorites',
+  '/settings',
+];
 
-// Only run Clerk middleware if valid keys are configured
-let clerkMiddlewareHandler: ((req: NextRequest) => Promise<NextResponse | undefined>) | null = null;
+// Auth pages — logged-in users should be bounced away from these
+const AUTH_PAGES = ['/sign-in', '/sign-up'];
 
-if (hasValidClerkKey) {
-  // Lazy import to avoid crash when key is missing
-  const { clerkMiddleware, createRouteMatcher } = require('@clerk/nextjs/server');
+export function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl;
 
-  const isPublicRoute = createRouteMatcher([
-    '/',
-    '/sign-in(.*)',
-    '/sign-up(.*)',
-    '/api/webhook(.*)',
-  ]);
-
-  clerkMiddlewareHandler = clerkMiddleware(async (auth: () => Promise<{ userId: string | null }>, req: NextRequest) => {
-    if (!isPublicRoute(req)) {
-      const { userId } = await auth();
-      if (!userId) {
-        const signInUrl = new URL('/sign-in', req.url);
-        signInUrl.searchParams.set('redirect_url', req.url);
-        return NextResponse.redirect(signInUrl);
-      }
-    }
-  });
-}
-
-export async function middleware(req: NextRequest) {
-  if (clerkMiddlewareHandler) {
-    const result = await clerkMiddlewareHandler(req);
-    if (result) return result;
+  // Always allow API routes, Next internals, and static files
+  if (
+    pathname.startsWith('/api/') ||
+    pathname.startsWith('/_next/') ||
+    pathname.startsWith('/favicon')
+  ) {
+    return NextResponse.next();
   }
+
+  const userId = req.cookies.get('user_id')?.value;
+  const isAuthenticated = Boolean(userId && userId.length > 0);
+
+  const isProtected = PROTECTED_PREFIXES.some((prefix) =>
+    pathname.startsWith(prefix)
+  );
+  const isAuthPage = AUTH_PAGES.some((page) => pathname.startsWith(page));
+
+  // Unauthenticated user trying to reach a protected route → sign-up
+  if (isProtected && !isAuthenticated) {
+    const signUpUrl = new URL('/sign-up', req.url);
+    return NextResponse.redirect(signUpUrl);
+  }
+
+  // Authenticated user trying to reach sign-in or sign-up → dashboard
+  if (isAuthPage && isAuthenticated) {
+    const redirectUrl = req.nextUrl.searchParams.get('redirect_url');
+    if (redirectUrl) {
+      return NextResponse.redirect(new URL(redirectUrl, req.url));
+    }
+    const dashboardUrl = new URL('/dashboard', req.url);
+    return NextResponse.redirect(dashboardUrl);
+  }
+
   return NextResponse.next();
 }
 
 export const config = {
   matcher: [
-    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
-    '/(api|trpc)(.*)',
+    /*
+     * Match everything except:
+     *  - _next/static
+     *  - _next/image
+     *  - image/font files
+     */
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|woff2?|ttf|otf|eot|css|js)$).*)',
   ],
 };

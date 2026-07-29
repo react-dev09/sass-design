@@ -23,14 +23,6 @@ export default function NewAuditPage() {
 
       const auditUrl = url.startsWith('http') ? url : `https://${url}`;
 
-      // Mock audit data - in production this would call the backend
-      const perfScore = 75 + Math.random() * 25;
-      const seoScore = 80 + Math.random() * 20;
-      const a11yScore = 72 + Math.random() * 28;
-      const uxScore = 78 + Math.random() * 22;
-      const convScore = 65 + Math.random() * 35;
-      const overall = Math.round((perfScore + seoScore + a11yScore + uxScore + convScore) / 5);
-
       // Capture website screenshot
       let screenshotUrl = null;
       try {
@@ -53,34 +45,25 @@ export default function NewAuditPage() {
         console.log('❌ [AUDIT] Screenshot capture exception:', e);
       }
 
-      const mockAuditId = 'audit_' + Date.now();
+      // Call the API to fetch real audit data (which queries PageSpeed Insights)
+      console.log('🔍 [AUDIT] Calling /api/audit/create for URL:', auditUrl);
+      const auditRes = await fetch('/api/audit/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: auditUrl }),
+      });
+
+      if (!auditRes.ok) {
+        throw new Error('Failed to run audit. Please try again.');
+      }
+
+      const { auditId: mockAuditId, audit: realAuditData } = await auditRes.json();
+      console.log('✅ [AUDIT] Audit API successful:', mockAuditId);
+
+      // Save real audit data to localStorage
       localStorage.setItem(`audit_${mockAuditId}`, JSON.stringify({
-        id: mockAuditId,
-        url: auditUrl,
-        timestamp: new Date().toISOString(),
-        overall: overall,
-        screenshotUrl: screenshotUrl,
-        performance: {
-          score: perfScore,
-          lcp: 2.1 + Math.random(),
-          cls: 0.05 + Math.random() * 0.1,
-          fcp: 1.2 + Math.random(),
-          ttfb: 0.4 + Math.random() * 0.3,
-          speedIndex: 3.5 + Math.random() * 2,
-        },
-        seo: {
-          score: seoScore,
-          issues: ['Missing meta description on 3 pages', 'No structured data found', 'Mobile viewport configured'],
-        },
-        accessibility: {
-          score: a11yScore,
-        },
-        ux: {
-          score: uxScore,
-        },
-        conversion: {
-          score: convScore,
-        },
+        ...realAuditData,
+        screenshotUrl: screenshotUrl || realAuditData.screenshotUrl,
       }));
 
       router.push(`/audits/${mockAuditId}`);

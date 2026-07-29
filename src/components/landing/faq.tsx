@@ -44,7 +44,7 @@ export function FAQSection() {
   const [open, setOpen] = useState<number | null>(null);
 
   return (
-    <section id="faq" className="py-24 max-w-7xl mx-auto px-6 relative" style={{
+    <section id="faq" className="py-16 lg:py-24 max-w-7xl mx-auto px-6 relative" style={{
       backgroundImage: 'url(/static/images/pattern-testimonials-card.be52eae.svg)',
       backgroundRepeat: 'no-repeat',
       backgroundPosition: 'right -50px top',

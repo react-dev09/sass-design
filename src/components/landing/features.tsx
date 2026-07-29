@@ -38,7 +38,7 @@ const features = [
 
 export function FeaturesSection() {
   return (
-    <section id="features" className="py-24 max-w-7xl mx-auto px-6">
+    <section id="features" className="py-16 lg:py-24 max-w-7xl mx-auto px-6">
       <div className="text-center mb-16">
         <motion.p
           initial={{ opacity: 0 }}
@@ -81,11 +81,10 @@ export function FeaturesSection() {
               transition={{ delay: i * 0.08 }}
               className="group relative rounded-2xl p-8 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 overflow-hidden"
               style={{
-                backgroundColor: '#dceeeb',
-                backgroundImage: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" fill="none"><defs><pattern id="p" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><line x1="0" y1="0" x2="20" y2="20" stroke="%23a8e6da" stroke-width="1" opacity="0.3"/></pattern></defs><rect width="200" height="200" fill="url(%23p)"/></svg>')`,
-                backgroundRepeat: 'no-repeat',
-                backgroundPosition: 'bottom right',
-                backgroundSize: '150px 150px',
+                backgroundImage: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" fill="none"><defs><pattern id="p" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><line x1="0" y1="0" x2="20" y2="20" stroke="%23a8e6da" stroke-width="1" opacity="0.3"/></pattern></defs><rect width="200" height="200" fill="url(%23p)"/></svg>'), linear-gradient(rgb(255, 255, 255) 0, rgb(212, 177, 255) 142.43%)`,
+                backgroundRepeat: 'no-repeat, no-repeat',
+                backgroundPosition: 'bottom right, center',
+                backgroundSize: '150px 150px, cover',
               }}
             >
               <div className="relative z-10">

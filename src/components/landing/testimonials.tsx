@@ -49,8 +49,62 @@ const testimonials = [
 ];
 
 export function TestimonialsSection() {
+  // Split into two rows for the marquee
+  const row1 = testimonials.slice(0, 3);
+  const row2 = testimonials.slice(3, 6);
+
+  const TestimonialCard = ({ t }: { t: typeof testimonials[0] }) => (
+    <div className="w-[85vw] sm:w-[400px] flex-shrink-0 group relative rounded-2xl border border-white/40 bg-white/50 backdrop-blur-md p-7 flex flex-col gap-5 hover:bg-white/70 hover:shadow-lg transition-all duration-300">
+      {/* Decorative quote mark */}
+      <div className="absolute top-4 right-6 text-5xl text-gray-300 font-serif">"</div>
+
+      <div className="flex gap-1">
+        {Array.from({ length: t.stars }).map((_, si) => (
+          <Star key={si} className="w-4 h-4 text-amber-400" fill="currentColor" />
+        ))}
+      </div>
+      <p className="text-sm leading-relaxed flex-1 transition-colors duration-300" style={{ color: '#000000' }}>
+        &ldquo;{t.quote}&rdquo;
+      </p>
+      <div className="flex items-center gap-3 pt-2 border-t border-gray-200 transition-colors duration-300">
+        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-600 to-violet-500 border border-violet-400/30 flex items-center justify-center text-xs font-bold text-white shadow-lg shadow-violet-500/30">
+          {t.avatar}
+        </div>
+        <div>
+          <p className="text-sm font-semibold transition-colors duration-300" style={{ color: '#000000' }}>
+            {t.author}
+          </p>
+          <p className="text-xs transition-colors duration-300" style={{ color: '#000000' }}>
+            {t.role}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
-    <section className="py-24 overflow-hidden" style={{ backgroundColor: '#ecf4f2' }}>
+    <section className="py-16 lg:py-24 overflow-hidden relative" style={{ backgroundColor: '#ecf4f2' }}>
+      <style dangerouslySetInnerHTML={{__html: `
+        @keyframes marquee {
+          0% { transform: translateX(0%); }
+          100% { transform: translateX(calc(-50% - 1rem)); }
+        }
+        @keyframes marquee-reverse {
+          0% { transform: translateX(calc(-50% - 1rem)); }
+          100% { transform: translateX(0%); }
+        }
+        .animate-marquee {
+          animation: marquee 30s linear infinite;
+        }
+        .animate-marquee-reverse {
+          animation: marquee-reverse 30s linear infinite;
+        }
+        .group-hover\\:pause-marquee:hover .animate-marquee,
+        .group-hover\\:pause-marquee:hover .animate-marquee-reverse {
+          animation-play-state: paused;
+        }
+      `}} />
+
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-16">
           <motion.p
@@ -72,42 +126,31 @@ export function TestimonialsSection() {
             Trusted by developers and agencies
           </motion.h2>
         </div>
+      </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {testimonials.map((t, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.08 }}
-              className="group relative rounded-2xl border border-gray-200 bg-white p-7 flex flex-col gap-5 hover:border-gray-300 hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
-            >
-              {/* Decorative quote mark */}
-              <div className="absolute top-4 right-6 text-5xl text-gray-300 font-serif">"</div>
-
-              <div className="flex gap-1">
-                {Array.from({ length: t.stars }).map((_, si) => (
-                  <Star key={si} className="w-4 h-4 text-amber-400" fill="currentColor" />
-                ))}
-              </div>
-              <p className="text-sm leading-relaxed flex-1 transition-colors duration-300" style={{ color: '#000000' }}>&ldquo;{t.quote}&rdquo;</p>
-              <div className="flex items-center gap-3 pt-2 border-t border-gray-200 transition-colors duration-300">
-                <motion.div
-                  className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-600 to-violet-500 border border-violet-400/30 flex items-center justify-center text-xs font-bold text-white group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-violet-500/30"
-                  whileHover={{ scale: 1.1 }}
-                >
-                  {t.avatar}
-                </motion.div>
-                <div>
-                  <p className="text-sm font-semibold transition-colors duration-300" style={{ color: '#000000' }}>{t.author}</p>
-                  <p className="text-xs transition-colors duration-300" style={{ color: '#000000' }}>{t.role}</p>
-                </div>
-              </div>
-            </motion.div>
+      {/* Marquee Container */}
+      <div className="group group-hover:pause-marquee flex flex-col gap-8 w-full max-w-[100vw]">
+        
+        {/* Row 1 */}
+        <div className="flex w-max gap-8 animate-marquee">
+          {/* We duplicate the array 4 times to ensure it covers very wide screens and loops seamlessly */}
+          {[...row1, ...row1, ...row1, ...row1].map((t, i) => (
+            <TestimonialCard key={`r1-${i}`} t={t} />
           ))}
         </div>
+
+        {/* Row 2 (Reversed) */}
+        <div className="flex w-max gap-8 animate-marquee-reverse">
+          {[...row2, ...row2, ...row2, ...row2].map((t, i) => (
+            <TestimonialCard key={`r2-${i}`} t={t} />
+          ))}
+        </div>
+
       </div>
+      
+      {/* Edge gradient masks to fade out the edges */}
+      <div className="absolute inset-y-0 left-0 w-16 sm:w-32 bg-gradient-to-r from-[#ecf4f2] to-transparent pointer-events-none" />
+      <div className="absolute inset-y-0 right-0 w-16 sm:w-32 bg-gradient-to-l from-[#ecf4f2] to-transparent pointer-events-none" />
     </section>
   );
 }

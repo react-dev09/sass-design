@@ -5,6 +5,12 @@ import { usePathname, useRouter } from 'next/navigation';
 import { Search, Menu, User, LogOut, Zap } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
+function getCookieValue(name: string): string {
+  if (typeof document === 'undefined') return '';
+  const match = document.cookie.match(new RegExp('(?:^|;\\s*)' + name + '=([^;]*)'));
+  return match ? decodeURIComponent(match[1]) : '';
+}
+
 const pageTitles: Record<string, string> = {
   '/dashboard': 'Overview',
   '/audits/new': 'New Audit',
@@ -20,10 +26,15 @@ export function DashboardTopNav() {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [userEmail, setUserEmail] = useState('');
 
   const title =
     Object.entries(pageTitles).find(([key]) => pathname.startsWith(key))?.[1] ??
     'Dashboard';
+
+  useEffect(() => {
+    setUserEmail(getCookieValue('user_email'));
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -44,7 +55,7 @@ export function DashboardTopNav() {
     setIsLoggingOut(true);
     try {
       await fetch('/api/auth/logout', { method: 'POST' });
-      router.push('/');
+      router.push('/sign-in');
     } catch (err) {
       console.error('Logout failed:', err);
       setIsLoggingOut(false);
@@ -111,10 +122,15 @@ export function DashboardTopNav() {
             <span className="hidden sm:inline">Logout</span>
           </button>
 
-          <div className="lg:hidden">
-            <div className="w-8 h-8 rounded-full bg-blue-100 border border-blue-200 flex items-center justify-center">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-full bg-blue-100 border border-blue-200 flex items-center justify-center flex-shrink-0">
               <User className="w-4 h-4 text-blue-600" />
             </div>
+            {userEmail && (
+              <span className="hidden md:block text-xs text-gray-600 max-w-[140px] truncate" title={userEmail}>
+                {userEmail}
+              </span>
+            )}
           </div>
         </div>
       </header>

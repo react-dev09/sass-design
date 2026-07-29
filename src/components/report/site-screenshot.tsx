@@ -31,7 +31,7 @@ export function SiteScreenshot({ screenshotUrl, siteUrl, title, deviceType = 'de
   const [lightbox, setLightbox] = useState(false);
   const [activeTab, setActiveTab] = useState<ScreenshotType>('desktop');
   const [screenshots, setScreenshots] = useState<Record<ScreenshotType, string | null>>({
-    desktop: null,
+    desktop: screenshotUrl,
     mobile: null,
     fullpage: null,
   });
@@ -153,7 +153,7 @@ export function SiteScreenshot({ screenshotUrl, siteUrl, title, deviceType = 'de
               <div className="w-3 h-3 rounded-full bg-amber-500/60" />
               <div className="w-3 h-3 rounded-full bg-emerald-500/60" />
             </div>
-            <div className="flex-1 rounded px-3 py-1 text-xs truncate" style={{ backgroundColor: '#c0c1cc', color: '#000000' }}>
+            <div className="flex-1 rounded px-3 py-1 text-xs truncate text-black font-medium" style={{ backgroundColor: '#c0c1cc' }}>
               {siteUrl}
             </div>
             <div className="flex gap-1">
@@ -197,19 +197,30 @@ export function SiteScreenshot({ screenshotUrl, siteUrl, title, deviceType = 'de
               alignItems: 'center',
               justifyContent: 'center'
             }}>
-              <iframe
-                key={`${siteUrl}-${activeTab}`}
-                src={siteUrl}
-                title={`${activeTab} preview of ${getDomain(siteUrl)}`}
-                style={{
-                  width: activeTab === 'mobile' ? '375px' : '100%',
-                  height: activeTab === 'mobile' ? '812px' : '100%',
-                  border: 'none',
-                  borderRadius: activeTab === 'mobile' ? '16px' : '0',
-                  boxShadow: activeTab === 'mobile' ? '0 20px 60px rgba(0,0,0,0.1)' : 'none',
-                }}
-                sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-presentation"
-              />
+              {screenshots[activeTab] ? (
+                <img
+                  src={screenshots[activeTab]!}
+                  alt={`${activeTab} preview of ${getDomain(siteUrl)}`}
+                  className="text-black font-medium"
+                  style={{
+                    width: activeTab === 'mobile' ? '375px' : '100%',
+                    height: activeTab === 'mobile' ? '812px' : '100%',
+                    objectFit: activeTab === 'mobile' ? 'contain' : 'cover',
+                    objectPosition: 'top',
+                    borderRadius: activeTab === 'mobile' ? '16px' : '0',
+                    boxShadow: activeTab === 'mobile' ? '0 20px 60px rgba(0,0,0,0.1)' : 'none',
+                  }}
+                />
+              ) : isCapturing ? (
+                <div className="flex flex-col items-center justify-center text-black w-full h-full font-medium">
+                  <div className="w-8 h-8 border-4 border-zinc-300 border-t-violet-500 rounded-full animate-spin mb-4" />
+                  <p>Capturing {activeTab} screenshot...</p>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center text-black w-full h-full bg-zinc-100 font-medium">
+                  <p>Failed to load {activeTab} screenshot</p>
+                </div>
+              )}
             </div>
           </div>
         </div>

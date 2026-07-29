@@ -77,8 +77,13 @@ function IssueCard({ issue, index }: { issue: Issue; index: number }) {
                     </div>
                     <div className="flex items-center justify-between gap-2">
                       <span style={{ color: '#d32f2f' }} className="truncate">❌ {file.issue}</span>
-                      <span style={{ color: '#388e3c' }} className="truncate">✓ {file.fix}</span>
+                      {file.fix && <span style={{ color: '#388e3c' }} className="truncate">✓ {file.fix}</span>}
                     </div>
+                    {file.snippet && (
+                      <div className="mt-2 bg-[#f4f5f8] p-2 rounded border border-[#c0c1cc] text-[#0052cc] overflow-x-auto whitespace-pre-wrap text-[10px] leading-relaxed">
+                        {file.snippet}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -141,25 +146,25 @@ export function IssuesList({ issues }: { issues: Issue[] }) {
   return (
     <div className="space-y-5">
       {/* SEMrush Severity Filter Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-xl border-0" style={{ backgroundColor: '#ebecf2' }}>
-        <div className="flex items-center gap-1.5 overflow-x-auto">
+      <div className="flex flex-col gap-4 p-3 rounded-xl border-0" style={{ backgroundColor: '#ebecf2' }}>
+        <div className="flex flex-nowrap items-center gap-2 overflow-x-auto pb-1 scrollbar-hide">
           <button
             onClick={() => setActiveTab('all')}
             className={cn(
-              'px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5',
+              'px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 whitespace-nowrap',
               activeTab === 'all' ? 'text-white shadow-md' : 'hover:opacity-80'
             )}
-            style={activeTab === 'all' ? { backgroundColor: '#9250e6', color: 'white' } : { color: '#000000' }}
+            style={activeTab === 'all' ? { backgroundColor: '#9250e6', color: 'white' } : { color: '#000000', backgroundColor: '#d5d6dc' }}
           >
             All Issues ({issues.length})
           </button>
           <button
             onClick={() => setActiveTab('critical')}
             className={cn(
-              'px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5',
-              activeTab === 'critical' ? 'border' : ''
+              'px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 whitespace-nowrap',
+              activeTab === 'critical' ? 'border' : 'border border-transparent hover:border-red-200'
             )}
-            style={activeTab === 'critical' ? { backgroundColor: '#ffebee', color: '#c62828', borderColor: '#ef5350' } : { color: '#d32f2f' }}
+            style={activeTab === 'critical' ? { backgroundColor: '#ffebee', color: '#c62828', borderColor: '#ef5350' } : { color: '#d32f2f', backgroundColor: '#fff' }}
           >
             <XCircle className="w-3.5 h-3.5" />
             Errors ({criticalCount})
@@ -167,10 +172,10 @@ export function IssuesList({ issues }: { issues: Issue[] }) {
           <button
             onClick={() => setActiveTab('warning')}
             className={cn(
-              'px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5',
-              activeTab === 'warning' ? 'border' : ''
+              'px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 whitespace-nowrap',
+              activeTab === 'warning' ? 'border' : 'border border-transparent hover:border-orange-200'
             )}
-            style={activeTab === 'warning' ? { backgroundColor: '#fff3e0', color: '#e65100', borderColor: '#ffb74d' } : { color: '#ff9800' }}
+            style={activeTab === 'warning' ? { backgroundColor: '#fff3e0', color: '#e65100', borderColor: '#ffb74d' } : { color: '#ff9800', backgroundColor: '#fff' }}
           >
             <AlertTriangle className="w-3.5 h-3.5" />
             Warnings ({warningCount})
@@ -178,10 +183,10 @@ export function IssuesList({ issues }: { issues: Issue[] }) {
           <button
             onClick={() => setActiveTab('info')}
             className={cn(
-              'px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5',
-              activeTab === 'info' ? 'border' : ''
+              'px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 whitespace-nowrap',
+              activeTab === 'info' ? 'border' : 'border border-transparent hover:border-blue-200'
             )}
-            style={activeTab === 'info' ? { backgroundColor: '#e3f2fd', color: '#1565c0', borderColor: '#64b5f6' } : { color: '#1976d2' }}
+            style={activeTab === 'info' ? { backgroundColor: '#e3f2fd', color: '#1565c0', borderColor: '#64b5f6' } : { color: '#1976d2', backgroundColor: '#fff' }}
           >
             <Info className="w-3.5 h-3.5" />
             Notices ({infoCount})
@@ -189,13 +194,13 @@ export function IssuesList({ issues }: { issues: Issue[] }) {
         </div>
 
         {/* Category Filter */}
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-medium" style={{ color: '#000000' }}>Category:</span>
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <span className="text-xs font-semibold whitespace-nowrap" style={{ color: '#000000' }}>Category:</span>
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="text-xs rounded-lg px-2.5 py-1.5 focus:outline-none border"
-            style={{ backgroundColor: '#000000', color: 'white', borderColor: '#333333' }}
+            className="text-xs rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#9250e6] border shadow-sm cursor-pointer"
+            style={{ backgroundColor: '#ffffff', color: '#000000', borderColor: '#c0c1cc' }}
           >
             <option value="all">All Categories</option>
             {categories.map(cat => (

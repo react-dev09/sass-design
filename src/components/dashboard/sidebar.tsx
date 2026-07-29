@@ -14,6 +14,13 @@ import {
   User,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useState, useEffect } from 'react';
+
+function getCookieValue(name: string): string {
+  if (typeof document === 'undefined') return '';
+  const match = document.cookie.match(new RegExp('(?:^|;\\s*)' + name + '=([^;]*)'));
+  return match ? decodeURIComponent(match[1]) : '';
+}
 
 const navItems = [
   { href: '/dashboard', label: 'Overview', icon: LayoutDashboard },
@@ -29,6 +36,11 @@ const bottomItems = [
 
 export function DashboardSidebar() {
   const pathname = usePathname();
+  const [userEmail, setUserEmail] = useState('');
+
+  useEffect(() => {
+    setUserEmail(getCookieValue('user_email'));
+  }, []);
 
   return (
     <aside className="hidden lg:flex flex-col w-64 border-r border-gray-200 bg-gray-50">
@@ -60,7 +72,7 @@ export function DashboardSidebar() {
                   item.accent
                     ? 'text-white hover:opacity-90'
                     : isActive
-                    ? 'bg-blue-50 text-blue-600 border-l-2 border-blue-600'
+                    ? 'bg-[#f4ebff] text-[#9250e6] border-l-2 border-[#9250e6]'
                     : 'text-black hover:bg-gray-100 hover:text-black'
                 )}
                 style={item.accent ? { backgroundColor: '#9250e6', borderColor: '#9250e6' } : {}}
@@ -68,7 +80,7 @@ export function DashboardSidebar() {
                 {isActive && !item.accent && (
                   <motion.div
                     layoutId="activeNav"
-                    className="absolute inset-0 rounded-lg bg-blue-50"
+                    className="absolute inset-0 rounded-lg bg-[#f4ebff]"
                     transition={{ duration: 0.2 }}
                   />
                 )}
@@ -91,7 +103,7 @@ export function DashboardSidebar() {
                 className={cn(
                   'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all',
                   isActive
-                    ? 'bg-blue-50 text-blue-600'
+                    ? 'bg-[#f4ebff] text-[#9250e6]'
                     : 'text-black hover:bg-gray-100 hover:text-black'
                 )}
               >
@@ -102,10 +114,19 @@ export function DashboardSidebar() {
           );
         })}
         <div className="flex items-center gap-3 px-3 py-2.5 mt-1">
-          <div className="w-7 h-7 rounded-full bg-blue-100 border border-blue-200 flex items-center justify-center">
+          <div className="w-7 h-7 rounded-full bg-blue-100 border border-blue-200 flex items-center justify-center flex-shrink-0">
             <User className="w-3.5 h-3.5 text-blue-600" />
           </div>
-          <span className="text-sm text-black">Account</span>
+          <div className="flex flex-col min-w-0">
+            <span className="text-xs font-medium text-black truncate" title={userEmail}>
+              {userEmail ? userEmail.split('@')[0] : 'Account'}
+            </span>
+            {userEmail && (
+              <span className="text-xs text-gray-400 truncate" title={userEmail}>
+                {userEmail}
+              </span>
+            )}
+          </div>
         </div>
       </div>
     </aside>

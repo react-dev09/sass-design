@@ -21,7 +21,12 @@ export interface PageSpeedData {
     speedIndex: number;
     inp: number;
   };
-  opportunities: Array<{ title: string; description: string; savings: number }>;
+  opportunities: Array<{ 
+    title: string; 
+    description: string; 
+    savings: number;
+    affectedFiles?: Array<{ name: string; issue: string; size?: string; fix?: string; snippet?: string }>;
+  }>;
   diagnostics: Array<{ title: string; description: string }>;
 }
 
@@ -172,19 +177,26 @@ Generate 5-8 top issues, 3-5 quick wins, and 5-7 roadmap items. Be specific to t
 }
 
 export function generateMockReport(context: AuditContext): { scores: AuditScores; report: AIReport } {
-  const basePerf = context.pageSpeedData?.performanceScore ?? 78;
+  // Strong hash (djb2) for highly varied but consistent mock scores
+  let urlHash = 5381;
+  for (let i = 0; i < context.url.length; i++) {
+    urlHash = ((urlHash << 5) + urlHash) + context.url.charCodeAt(i);
+  }
+  urlHash = Math.abs(urlHash);
 
-  // Generate varied scores based on URL hash for uniqueness
-  const urlHash = context.url.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const seed0 = urlHash % 100;
   const seed1 = (urlHash * 73) % 100;
   const seed2 = (urlHash * 137) % 100;
   const seed3 = (urlHash * 251) % 100;
   const seed4 = (urlHash * 419) % 100;
 
-  const seoScore = Math.max(45, Math.min(95, 65 + (seed1 - 50) / 2));
-  const accessibilityScore = Math.max(40, Math.min(90, 70 + (seed2 - 50) / 2));
-  const uxScore = Math.max(50, Math.min(92, 75 + (seed3 - 50) / 2));
-  const conversionScore = Math.max(35, Math.min(85, 60 + (seed4 - 50) / 2));
+  // If we don't have pageSpeedData, we should generate a highly varied performance score
+  const basePerf = context.pageSpeedData?.performanceScore ?? Math.max(40, Math.min(98, 60 + (seed0 - 50)));
+
+  const seoScore = Math.max(45, Math.min(98, 70 + (seed1 - 50)));
+  const accessibilityScore = Math.max(40, Math.min(98, 75 + (seed2 - 50)));
+  const uxScore = Math.max(50, Math.min(98, 75 + (seed3 - 50)));
+  const conversionScore = Math.max(35, Math.min(95, 65 + (seed4 - 50)));
   const overallScore = Math.round((basePerf + seoScore + accessibilityScore + uxScore + conversionScore) / 5);
 
   return {
@@ -198,12 +210,23 @@ export function generateMockReport(context: AuditContext): { scores: AuditScores
     },
     report: {
       executiveSummary: `${context.url} shows moderate performance with key opportunities for improvement across performance, accessibility, and conversion optimization. Core Web Vitals fall below recommended thresholds, which may be impacting search rankings and user retention. Addressing the identified critical issues could yield a 20-35% improvement in overall audit score.`,
-      topIssues: [
-        {
-          id: 'issue-1',
-          category: 'performance',
-          severity: 'critical',
-          title: 'Render-Blocking Resources',
+      topIssues: context.pageSpeedData && context.pageSpeedData.opportunities.length > 0
+        ? context.pageSpeedData.opportunities.map((opp, i) => ({
+            id: `issue-${i + 1}`,
+            category: 'performance',
+            severity: opp.savings > 1000 ? 'critical' : 'warning',
+            title: opp.title,
+            description: opp.description,
+            impact: `Estimated savings: ${Math.round(opp.savings)}ms`,
+            recommendation: 'Review details in Google PageSpeed Insights.',
+            affectedFiles: opp.affectedFiles,
+          }))
+        : [
+            {
+              id: 'issue-1',
+              category: 'performance',
+              severity: 'critical',
+              title: 'Render-Blocking Resources',
           description: 'Multiple CSS and JavaScript files are blocking the initial render of the page.',
           impact: 'Users experience a blank screen for 1.2s longer than necessary, increasing bounce rate.',
           recommendation: 'Use <link rel="preload"> for critical CSS and defer non-critical JS with async/defer attributes.',
@@ -350,9 +373,16 @@ export function generateMockReport(context: AuditContext): { scores: AuditScores
           estimatedGain: 'Better UX, fewer duplicate submissions',
         },
       ],
-      quickWins: [
-        {
-          title: 'Enable Browser Caching',
+      quickWins: context.pageSpeedData && context.pageSpeedData.diagnostics.length > 0
+        ? context.pageSpeedData.diagnostics.slice(0, 4).map((diag) => ({
+            title: diag.title,
+            description: diag.description,
+            effort: 'low',
+            impact: 'medium',
+          }))
+        : [
+            {
+              title: 'Enable Browser Caching',
           description: 'Add Cache-Control headers to serve static assets from cache on repeat visits.',
           effort: 'low',
           impact: 'high',

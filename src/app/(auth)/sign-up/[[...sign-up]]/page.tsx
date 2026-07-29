@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Loader, Mail, Check } from 'lucide-react';
+import { ArrowRight, Loader, Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { PremiumSaaSWaves } from '@/components/premium-saas-waves';
 
 const containerStyle: React.CSSProperties = {
@@ -93,6 +93,20 @@ const inputIconStyle: React.CSSProperties = {
   pointerEvents: 'none',
 };
 
+const eyeIconStyle: React.CSSProperties = {
+  position: 'absolute',
+  right: '0.75rem',
+  top: '50%',
+  transform: 'translateY(-50%)',
+  width: '1rem',
+  height: '1rem',
+  color: 'rgb(107, 114, 128)',
+  cursor: 'pointer',
+  border: 'none',
+  background: 'transparent',
+  padding: 0,
+};
+
 const inputStyle: React.CSSProperties = {
   background: 'rgba(30, 30, 35, 0.8)',
   border: '1px solid rgba(255, 255, 255, 0.1)',
@@ -101,7 +115,7 @@ const inputStyle: React.CSSProperties = {
   transition: 'all 250ms cubic-bezier(0.4, 0, 0.2, 1)',
   width: '100%',
   paddingLeft: '2.5rem',
-  paddingRight: '1rem',
+  paddingRight: '2.5rem',
   paddingTop: '0.75rem',
   paddingBottom: '0.75rem',
   borderRadius: '0.5rem',
@@ -165,70 +179,48 @@ const signinLinkStyle: React.CSSProperties = {
   textDecoration: 'none',
 };
 
-const demoBoxStyle: React.CSSProperties = {
-  background: 'rgba(16, 185, 129, 0.08)',
-  border: '1px solid rgba(16, 185, 129, 0.3)',
-  backdropFilter: 'blur(8px)',
-  WebkitBackdropFilter: 'blur(8px)',
-  borderRadius: '0.75rem',
-  padding: '1rem',
-  marginTop: '1.5rem',
-  position: 'relative',
-};
-
-const demoBoxGlowStyle: React.CSSProperties = {
-  position: 'absolute',
-  inset: -1,
-  borderRadius: '0.75rem',
-  background: 'radial-gradient(circle, rgba(16, 185, 129, 0.1), transparent 80%)',
-  pointerEvents: 'none',
-  zIndex: -1,
-};
-
-const demoContentStyle: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'flex-start',
-  gap: '0.75rem',
-};
-
-const demoIconStyle: React.CSSProperties = {
-  width: '1rem',
-  height: '1rem',
-  color: 'rgb(52, 211, 153)',
-  flexShrink: 0,
-  marginTop: '0.125rem',
-};
-
-const demoTextStyle: React.CSSProperties = {
-  fontSize: '0.75rem',
-  color: 'rgb(110, 231, 183)',
-  fontWeight: 500,
-};
-
 export default function SignUpPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    // Client-side validation
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters.');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+
     setLoading(true);
 
     try {
       const response = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, password }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        const data = await response.json();
         throw new Error(data.error || 'Failed to sign up');
       }
 
-      router.push('/dashboard');
+      // Redirect to sign-in after successful registration
+      router.push('/sign-in?registered=1');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
       setLoading(false);
@@ -256,12 +248,12 @@ export default function SignUpPage() {
           background: rgba(30, 30, 35, 0.95) !important;
           box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2), inset 0 0 20px rgba(139, 92, 246, 0.1) !important;
         }
-        button:hover:not(:disabled) {
+        button[type="submit"]:hover:not(:disabled) {
           transform: translateY(-4px);
           background: linear-gradient(135deg, #7C3AED 0%, #A855F7 100%) !important;
           box-shadow: 0 0 30px rgba(109, 40, 217, 0.7), 0 0 60px rgba(139, 92, 246, 0.4) !important;
         }
-        button:active:not(:disabled) {
+        button[type="submit"]:active:not(:disabled) {
           transform: translateY(-2px);
         }
       `}</style>
@@ -280,6 +272,7 @@ export default function SignUpPage() {
             </div>
 
             <form onSubmit={handleSignUp} style={formStyle}>
+              {/* Email */}
               <div style={formGroupStyle}>
                 <label style={labelStyle}>Email Address</label>
                 <div style={inputWrapperStyle}>
@@ -299,6 +292,63 @@ export default function SignUpPage() {
                 </div>
               </div>
 
+              {/* Password */}
+              <div style={formGroupStyle}>
+                <label style={labelStyle}>Password</label>
+                <div style={inputWrapperStyle}>
+                  <Lock style={inputIconStyle} />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      setError('');
+                    }}
+                    placeholder="Min. 6 characters"
+                    required
+                    disabled={loading}
+                    style={inputStyle}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    style={eyeIconStyle}
+                    tabIndex={-1}
+                  >
+                    {showPassword ? <EyeOff style={{ width: '1rem', height: '1rem' }} /> : <Eye style={{ width: '1rem', height: '1rem' }} />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Confirm Password */}
+              <div style={formGroupStyle}>
+                <label style={labelStyle}>Confirm Password</label>
+                <div style={inputWrapperStyle}>
+                  <Lock style={inputIconStyle} />
+                  <input
+                    type={showConfirm ? 'text' : 'password'}
+                    value={confirmPassword}
+                    onChange={(e) => {
+                      setConfirmPassword(e.target.value);
+                      setError('');
+                    }}
+                    placeholder="Re-enter your password"
+                    required
+                    disabled={loading}
+                    style={inputStyle}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirm(!showConfirm)}
+                    style={eyeIconStyle}
+                    tabIndex={-1}
+                  >
+                    {showConfirm ? <EyeOff style={{ width: '1rem', height: '1rem' }} /> : <Eye style={{ width: '1rem', height: '1rem' }} />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Error */}
               {error && (
                 <div style={errorBoxStyle}>
                   <p style={errorTextStyle}>{error}</p>
@@ -336,16 +386,6 @@ export default function SignUpPage() {
                 Sign in
               </Link>
             </p>
-
-            <div style={demoBoxStyle}>
-              <div style={demoBoxGlowStyle} />
-              <div style={demoContentStyle}>
-                <Check style={demoIconStyle} />
-                <p style={demoTextStyle}>
-                  Demo Mode: Enter any email to explore the dashboard.
-                </p>
-              </div>
-            </div>
           </div>
         </div>
       </div>

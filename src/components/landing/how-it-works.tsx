@@ -36,7 +36,7 @@ const steps = [
 
 export function HowItWorksSection() {
   return (
-    <section id="how-it-works" className="py-24" style={{ backgroundColor: '#ecf4f2' }}>
+    <section id="how-it-works" className="py-16 lg:py-24" style={{ backgroundColor: '#ecf4f2' }}>
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-16">
           <motion.p

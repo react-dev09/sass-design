@@ -21,7 +21,7 @@ export function HeroSection() {
       setError('Please enter a valid URL');
       return;
     }
-    router.push(`/sign-up?url=${encodeURIComponent(normalized)}`);
+    router.push(`/sign-in?redirect_url=${encodeURIComponent(`/audits/new?url=${encodeURIComponent(normalized)}`)}`);
   };
 
   return (
@@ -33,7 +33,7 @@ export function HeroSection() {
       }}
     >
 
-      <div className="relative max-w-4xl mx-auto px-6 text-center">
+      <div className="relative max-w-4xl mx-auto px-6 py-6 text-center">
         {/* Badge */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
